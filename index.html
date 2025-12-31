@@ -23,7 +23,6 @@
 
       :root {
         --tron-blue: #00d4ff;
-        --tron-orange: #ff6600;
         --black: #000;
       }
 
@@ -36,6 +35,28 @@
         justify-content: center;
         overflow: hidden;
         color: #fff;
+      }
+
+      /* 현재 시간 (우측 상단) */
+      .current-time {
+        position: fixed;
+        top: 20px;
+        right: 25px;
+        text-align: right;
+        z-index: 100;
+      }
+
+      .current-date {
+        font-size: 13px;
+        color: rgba(255, 255, 255, 0.4);
+        margin-bottom: 4px;
+      }
+
+      .current-clock {
+        font-family: "Orbitron", monospace;
+        font-size: 18px;
+        color: var(--tron-blue);
+        letter-spacing: 0.05em;
       }
 
       /* 트론 그리드 바닥 */
@@ -64,10 +85,7 @@
       .tron-grid::before {
         content: "";
         position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
+        inset: 0;
         background: repeating-linear-gradient(
           0deg,
           transparent,
@@ -114,7 +132,6 @@
         font-weight: 300;
         letter-spacing: 0.8em;
         color: rgba(0, 212, 255, 0.6);
-        text-transform: uppercase;
         margin-bottom: 50px;
       }
 
@@ -170,7 +187,6 @@
       .label {
         font-size: clamp(10px, 2.5vw, 14px);
         color: var(--tron-blue);
-        text-transform: uppercase;
         letter-spacing: 0.2em;
         margin-top: 12px;
         font-weight: 400;
@@ -197,20 +213,10 @@
       /* 하단 메시지 */
       .message {
         margin-top: 50px;
-      }
-
-      .message-main {
-        font-size: clamp(16px, 4vw, 24px);
-        font-weight: 400;
-        color: #fff;
-        letter-spacing: 0.3em;
-        margin-bottom: 10px;
-      }
-
-      .message-sub {
-        font-size: clamp(12px, 3vw, 16px);
-        color: rgba(255, 255, 255, 0.4);
-        letter-spacing: 0.2em;
+        font-size: clamp(14px, 3.5vw, 20px);
+        font-weight: 300;
+        color: rgba(255, 255, 255, 0.5);
+        letter-spacing: 0.15em;
       }
 
       /* 축하 화면 */
@@ -259,20 +265,27 @@
       /* 반응형 */
       @media (max-width: 600px) {
         .countdown {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 15px;
-          max-width: 280px;
-          margin: 0 auto;
+          gap: 10px;
         }
 
         .colon {
-          display: none;
+          font-size: 24px;
+          margin-bottom: 25px;
+        }
+
+        .number-box {
+          padding: 12px 16px;
         }
       }
     </style>
   </head>
   <body>
+    <!-- 현재 시간 -->
+    <div class="current-time">
+      <div class="current-date" id="currentDate">2025년 12월 31일 화요일</div>
+      <div class="current-clock" id="currentClock">22:30:45</div>
+    </div>
+
     <div class="tron-grid"></div>
     <div class="horizon"></div>
 
@@ -282,13 +295,6 @@
         <p class="subtitle">새해 카운트다운</p>
 
         <div class="countdown">
-          <div class="time-unit">
-            <div class="number-box">
-              <span class="number" id="days">00</span>
-            </div>
-            <span class="label">일</span>
-          </div>
-          <span class="colon">:</span>
           <div class="time-unit">
             <div class="number-box">
               <span class="number" id="hours">00</span>
@@ -311,16 +317,13 @@
           </div>
         </div>
 
-        <div class="message">
-          <p class="message-main">미래로의 여정</p>
-          <p class="message-sub">THE GRID AWAITS</p>
-        </div>
+        <p class="message">끝은 언제나 새로운 시작이다</p>
       </div>
 
       <div id="celebration-screen" class="celebration">
         <p class="celeb-title">새해 복 많이 받으세요</p>
         <div class="celeb-year">2026</div>
-        <p class="celeb-sub">미래가 시작됩니다</p>
+        <p class="celeb-sub">새로운 시작</p>
       </div>
     </div>
 
@@ -330,12 +333,34 @@
 
       const pad = (n) => String(n).padStart(2, "0");
 
+      const weekdays = [
+        "일요일",
+        "월요일",
+        "화요일",
+        "수요일",
+        "목요일",
+        "금요일",
+        "토요일",
+      ];
+
+      function updateCurrentTime() {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = now.getMonth() + 1;
+        const date = now.getDate();
+        const day = weekdays[now.getDay()];
+
+        document.getElementById("currentDate").textContent =
+          `${year}년 ${month}월 ${date}일 ${day}`;
+        document.getElementById("currentClock").textContent =
+          `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+      }
+
       function updateCountdown() {
         const now = new Date();
         const diff = newYear - now;
 
         if (diff <= 0) {
-          document.getElementById("days").textContent = "00";
           document.getElementById("hours").textContent = "00";
           document.getElementById("minutes").textContent = "00";
           document.getElementById("seconds").textContent = "00";
@@ -347,15 +372,12 @@
           return;
         }
 
-        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-        const hours = Math.floor(
-          (diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60),
-        );
+        // 총 시간으로 계산
+        const totalHours = Math.floor(diff / (1000 * 60 * 60));
         const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
         const secs = Math.floor((diff % (1000 * 60)) / 1000);
 
-        document.getElementById("days").textContent = pad(days);
-        document.getElementById("hours").textContent = pad(hours);
+        document.getElementById("hours").textContent = pad(totalHours);
         document.getElementById("minutes").textContent = pad(mins);
         document.getElementById("seconds").textContent = pad(secs);
       }
@@ -398,8 +420,13 @@
         });
       }
 
+      // 초기화 및 업데이트
+      updateCurrentTime();
       updateCountdown();
-      setInterval(updateCountdown, 1000);
+      setInterval(() => {
+        updateCurrentTime();
+        updateCountdown();
+      }, 1000);
     </script>
   </body>
 </html>
