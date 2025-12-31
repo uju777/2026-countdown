@@ -3,8 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>2026 카운트다운</title>
-    <meta name="description" content="2026년 새해 카운트다운" />
+    <title>2026 새해 카운트다운</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -23,11 +22,9 @@
       }
 
       :root {
-        --gold: #d4af37;
-        --gold-light: #f4d03f;
-        --chrome: #e8e8e8;
-        --black: #000000;
-        --dark: #0a0a0a;
+        --tron-blue: #00d4ff;
+        --tron-orange: #ff6600;
+        --black: #000;
       }
 
       body {
@@ -35,25 +32,62 @@
         background: var(--black);
         min-height: 100vh;
         display: flex;
-        flex-direction: column;
         align-items: center;
         justify-content: center;
         overflow: hidden;
-        color: var(--chrome);
+        color: #fff;
       }
 
-      /* 미니멀 그리드 */
-      .grid-bg {
+      /* 트론 그리드 바닥 */
+      .tron-grid {
         position: fixed;
+        bottom: 0;
+        left: -50%;
+        width: 200%;
+        height: 40%;
+        background:
+          linear-gradient(
+            90deg,
+            transparent 49.5%,
+            rgba(0, 212, 255, 0.15) 49.5%,
+            rgba(0, 212, 255, 0.15) 50.5%,
+            transparent 50.5%
+          ),
+          linear-gradient(0deg, rgba(0, 212, 255, 0.3) 0%, transparent 100%);
+        background-size:
+          80px 100%,
+          100% 100%;
+        transform: perspective(500px) rotateX(60deg);
+        transform-origin: center top;
+      }
+
+      .tron-grid::before {
+        content: "";
+        position: absolute;
         top: 0;
         left: 0;
-        width: 100%;
-        height: 100%;
-        background-image:
-          linear-gradient(rgba(212, 175, 55, 0.03) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(212, 175, 55, 0.03) 1px, transparent 1px);
-        background-size: 100px 100px;
-        z-index: 0;
+        right: 0;
+        bottom: 0;
+        background: repeating-linear-gradient(
+          0deg,
+          transparent,
+          transparent 78px,
+          rgba(0, 212, 255, 0.15) 78px,
+          rgba(0, 212, 255, 0.15) 80px
+        );
+      }
+
+      /* 수평선 글로우 */
+      .horizon {
+        position: fixed;
+        bottom: 40%;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: var(--tron-blue);
+        box-shadow:
+          0 0 20px var(--tron-blue),
+          0 0 40px var(--tron-blue);
       }
 
       .container {
@@ -63,24 +97,25 @@
         padding: 20px;
       }
 
-      /* 연도 타이틀 */
-      .year {
+      /* 메인 타이틀 */
+      .title {
         font-family: "Orbitron", monospace;
-        font-size: clamp(80px, 20vw, 200px);
+        font-size: clamp(60px, 18vw, 180px);
         font-weight: 900;
-        color: var(--gold);
-        letter-spacing: 0.05em;
+        color: var(--tron-blue);
+        letter-spacing: 0.1em;
         line-height: 1;
-        margin-bottom: 10px;
+        margin-bottom: 5px;
+        text-shadow: 0 0 30px var(--tron-blue);
       }
 
       .subtitle {
-        font-size: clamp(14px, 3vw, 20px);
+        font-size: clamp(14px, 4vw, 22px);
         font-weight: 300;
-        letter-spacing: 0.5em;
-        color: rgba(255, 255, 255, 0.4);
+        letter-spacing: 0.8em;
+        color: rgba(0, 212, 255, 0.6);
         text-transform: uppercase;
-        margin-bottom: 60px;
+        margin-bottom: 50px;
       }
 
       /* 카운트다운 */
@@ -88,7 +123,7 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        gap: clamp(10px, 3vw, 30px);
+        gap: clamp(8px, 2vw, 20px);
       }
 
       .time-unit {
@@ -97,63 +132,84 @@
         align-items: center;
       }
 
-      .number {
-        font-family: "Orbitron", monospace;
-        font-size: clamp(48px, 12vw, 120px);
-        font-weight: 700;
-        color: var(--chrome);
-        line-height: 1;
-        min-width: clamp(80px, 20vw, 180px);
-        padding: 20px 10px;
-        background: linear-gradient(180deg, #1a1a1a 0%, #0d0d0d 100%);
-        border: 1px solid rgba(212, 175, 55, 0.3);
-        border-radius: 8px;
+      .number-box {
         position: relative;
+        background: rgba(0, 0, 0, 0.8);
+        border: 2px solid var(--tron-blue);
+        padding: clamp(15px, 4vw, 30px) clamp(20px, 5vw, 40px);
+        clip-path: polygon(
+          10px 0,
+          100% 0,
+          100% calc(100% - 10px),
+          calc(100% - 10px) 100%,
+          0 100%,
+          0 10px
+        );
       }
 
-      .number::before {
+      .number-box::before {
         content: "";
         position: absolute;
-        top: 50%;
-        left: 0;
-        right: 0;
-        height: 1px;
-        background: rgba(0, 0, 0, 0.8);
+        inset: 0;
+        background: linear-gradient(
+          180deg,
+          rgba(0, 212, 255, 0.1) 0%,
+          transparent 50%
+        );
+        pointer-events: none;
+      }
+
+      .number {
+        font-family: "Orbitron", monospace;
+        font-size: clamp(40px, 11vw, 100px);
+        font-weight: 700;
+        color: #fff;
+        line-height: 1;
       }
 
       .label {
         font-size: clamp(10px, 2.5vw, 14px);
-        color: var(--gold);
+        color: var(--tron-blue);
         text-transform: uppercase;
-        letter-spacing: 0.3em;
-        margin-top: 15px;
-        font-weight: 500;
+        letter-spacing: 0.2em;
+        margin-top: 12px;
+        font-weight: 400;
       }
 
       .colon {
         font-family: "Orbitron", monospace;
-        font-size: clamp(36px, 8vw, 80px);
-        color: var(--gold);
-        padding-bottom: 40px;
-        animation: colonPulse 1s ease-in-out infinite;
+        font-size: clamp(30px, 8vw, 70px);
+        color: var(--tron-blue);
+        margin-bottom: 30px;
+        animation: pulse 1s ease-in-out infinite;
       }
 
-      @keyframes colonPulse {
+      @keyframes pulse {
         0%,
         100% {
           opacity: 1;
         }
         50% {
-          opacity: 0.3;
+          opacity: 0.2;
         }
       }
 
       /* 하단 메시지 */
       .message {
-        margin-top: 60px;
-        font-size: clamp(14px, 3vw, 18px);
-        font-weight: 300;
-        color: rgba(255, 255, 255, 0.3);
+        margin-top: 50px;
+      }
+
+      .message-main {
+        font-size: clamp(16px, 4vw, 24px);
+        font-weight: 400;
+        color: #fff;
+        letter-spacing: 0.3em;
+        margin-bottom: 10px;
+      }
+
+      .message-sub {
+        font-size: clamp(12px, 3vw, 16px);
+        color: rgba(255, 255, 255, 0.4);
         letter-spacing: 0.2em;
       }
 
@@ -164,118 +220,109 @@
 
       .celebration.active {
         display: block;
-        animation: fadeIn 1s ease;
+        animation: fadeIn 0.5s ease;
       }
 
       @keyframes fadeIn {
         from {
           opacity: 0;
-          transform: scale(0.9);
         }
         to {
           opacity: 1;
-          transform: scale(1);
         }
       }
 
-      .celebration-title {
-        font-family: "Orbitron", monospace;
-        font-size: clamp(32px, 10vw, 80px);
-        font-weight: 900;
-        color: var(--gold);
+      .celeb-title {
+        font-size: clamp(24px, 6vw, 48px);
+        color: var(--tron-blue);
+        letter-spacing: 0.5em;
         margin-bottom: 20px;
+        text-shadow: 0 0 20px var(--tron-blue);
       }
 
-      .celebration-year {
+      .celeb-year {
         font-family: "Orbitron", monospace;
-        font-size: clamp(100px, 25vw, 250px);
+        font-size: clamp(80px, 22vw, 220px);
         font-weight: 900;
-        color: var(--chrome);
+        color: #fff;
         line-height: 1;
+        text-shadow: 0 0 40px var(--tron-blue);
       }
 
-      .celebration-sub {
-        font-size: clamp(16px, 4vw, 24px);
-        color: rgba(255, 255, 255, 0.5);
+      .celeb-sub {
+        font-size: clamp(18px, 5vw, 32px);
+        color: var(--tron-blue);
         margin-top: 30px;
         letter-spacing: 0.3em;
-      }
-
-      /* 하단 바 */
-      .bottom-bar {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        height: 3px;
-        background: linear-gradient(
-          90deg,
-          transparent 0%,
-          var(--gold) 20%,
-          var(--gold) 80%,
-          transparent 100%
-        );
-        opacity: 0.5;
       }
 
       /* 반응형 */
       @media (max-width: 600px) {
         .countdown {
-          flex-wrap: wrap;
+          display: grid;
+          grid-template-columns: 1fr 1fr;
           gap: 15px;
+          max-width: 280px;
+          margin: 0 auto;
         }
 
         .colon {
           display: none;
         }
-
-        .number {
-          min-width: 70px;
-        }
       }
     </style>
   </head>
   <body>
-    <div class="grid-bg"></div>
+    <div class="tron-grid"></div>
+    <div class="horizon"></div>
 
     <div class="container">
       <div id="countdown-screen">
-        <h1 class="year">2026</h1>
-        <p class="subtitle">New Year Countdown</p>
+        <h1 class="title">2026</h1>
+        <p class="subtitle">새해 카운트다운</p>
 
         <div class="countdown">
           <div class="time-unit">
-            <div class="number" id="days">00</div>
-            <span class="label">Days</span>
+            <div class="number-box">
+              <span class="number" id="days">00</span>
+            </div>
+            <span class="label">일</span>
           </div>
           <span class="colon">:</span>
           <div class="time-unit">
-            <div class="number" id="hours">00</div>
-            <span class="label">Hours</span>
+            <div class="number-box">
+              <span class="number" id="hours">00</span>
+            </div>
+            <span class="label">시간</span>
           </div>
           <span class="colon">:</span>
           <div class="time-unit">
-            <div class="number" id="minutes">00</div>
-            <span class="label">Min</span>
+            <div class="number-box">
+              <span class="number" id="minutes">00</span>
+            </div>
+            <span class="label">분</span>
           </div>
           <span class="colon">:</span>
           <div class="time-unit">
-            <div class="number" id="seconds">00</div>
-            <span class="label">Sec</span>
+            <div class="number-box">
+              <span class="number" id="seconds">00</span>
+            </div>
+            <span class="label">초</span>
           </div>
         </div>
 
-        <p class="message">WELCOME TO THE FUTURE</p>
+        <div class="message">
+          <p class="message-main">미래로의 여정</p>
+          <p class="message-sub">THE GRID AWAITS</p>
+        </div>
       </div>
 
       <div id="celebration-screen" class="celebration">
-        <h1 class="celebration-title">HAPPY NEW YEAR</h1>
-        <div class="celebration-year">2026</div>
-        <p class="celebration-sub">THE FUTURE IS NOW</p>
+        <p class="celeb-title">새해 복 많이 받으세요</p>
+        <div class="celeb-year">2026</div>
+        <p class="celeb-sub">미래가 시작됩니다</p>
       </div>
     </div>
-
-    <div class="bottom-bar"></div>
 
     <script>
       const newYear = new Date("2026-01-01T00:00:00+09:00");
@@ -317,39 +364,37 @@
         document.getElementById("countdown-screen").style.display = "none";
         document.getElementById("celebration-screen").classList.add("active");
 
-        // 골드 컨페티
-        const duration = 10000;
+        const colors = ["#00d4ff", "#ffffff", "#00aaff"];
+        const duration = 8000;
         const end = Date.now() + duration;
 
         const frame = () => {
           confetti({
-            particleCount: 3,
+            particleCount: 2,
             angle: 60,
             spread: 55,
             origin: { x: 0 },
-            colors: ["#d4af37", "#f4d03f", "#ffffff"],
+            colors: colors,
           });
           confetti({
-            particleCount: 3,
+            particleCount: 2,
             angle: 120,
             spread: 55,
             origin: { x: 1 },
-            colors: ["#d4af37", "#f4d03f", "#ffffff"],
+            colors: colors,
           });
 
           if (Date.now() < end) {
             requestAnimationFrame(frame);
           }
         };
-
         frame();
 
-        // 중앙 폭발
         confetti({
-          particleCount: 150,
-          spread: 100,
+          particleCount: 100,
+          spread: 70,
           origin: { y: 0.6 },
-          colors: ["#d4af37", "#f4d03f", "#e8e8e8"],
+          colors: colors,
         });
       }
 
