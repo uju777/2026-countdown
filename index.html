@@ -227,10 +227,10 @@
         z-index: 4;
       }
 
-      /* 컨테이너 - 하단 지평선 근처 */
+      /* 컨테이너 - 그리드 위 */
       .container {
         position: fixed;
-        bottom: calc(40% + 20px);
+        bottom: 8%;
         left: 50%;
         transform: translateX(-50%);
         z-index: 10;
@@ -433,8 +433,177 @@
       /* 반응형 */
       @media (max-width: 600px) {
         .container {
-          bottom: calc(40% + 10px);
+          bottom: 5%;
           padding: 15px;
+        }
+      }
+
+      /* 새해 축하 효과 */
+      .celebration-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 500;
+        opacity: 0;
+        transition: opacity 2s ease;
+      }
+
+      .celebration-overlay.active {
+        opacity: 1;
+      }
+
+      /* 부드러운 빛줄기 */
+      .light-rays {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 200vmax;
+        height: 200vmax;
+        transform: translate(-50%, -50%);
+        background: conic-gradient(
+          from 0deg,
+          transparent 0deg,
+          rgba(0, 212, 255, 0.03) 10deg,
+          transparent 20deg,
+          transparent 30deg,
+          rgba(255, 0, 255, 0.02) 40deg,
+          transparent 50deg,
+          transparent 60deg,
+          rgba(255, 255, 255, 0.03) 70deg,
+          transparent 80deg
+        );
+        animation: rotateRays 20s linear infinite;
+      }
+
+      @keyframes rotateRays {
+        from {
+          transform: translate(-50%, -50%) rotate(0deg);
+        }
+        to {
+          transform: translate(-50%, -50%) rotate(360deg);
+        }
+      }
+
+      /* 부드러운 글로우 펄스 */
+      .glow-pulse {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 100%;
+        height: 100%;
+        transform: translate(-50%, -50%);
+        background: radial-gradient(
+          ellipse at center,
+          rgba(0, 212, 255, 0.1) 0%,
+          transparent 50%
+        );
+        animation: glowPulse 4s ease-in-out infinite;
+      }
+
+      @keyframes glowPulse {
+        0%,
+        100% {
+          opacity: 0.3;
+          transform: translate(-50%, -50%) scale(1);
+        }
+        50% {
+          opacity: 0.6;
+          transform: translate(-50%, -50%) scale(1.1);
+        }
+      }
+
+      /* 떠다니는 별 */
+      .floating-stars {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+      }
+
+      .star {
+        position: absolute;
+        width: 4px;
+        height: 4px;
+        background: white;
+        border-radius: 50%;
+        animation: floatUp 8s ease-in-out infinite;
+        opacity: 0;
+      }
+
+      @keyframes floatUp {
+        0% {
+          transform: translateY(100vh) scale(0);
+          opacity: 0;
+        }
+        10% {
+          opacity: 0.8;
+        }
+        90% {
+          opacity: 0.8;
+        }
+        100% {
+          transform: translateY(-100vh) scale(1);
+          opacity: 0;
+        }
+      }
+
+      /* 축하 화면 스타일 강화 */
+      .celebration.active .celeb-year {
+        animation:
+          celebYearGlow 2s ease-in-out infinite,
+          celebFloat 3s ease-in-out infinite;
+      }
+
+      @keyframes celebYearGlow {
+        0%,
+        100% {
+          text-shadow:
+            0 0 30px var(--tron-blue),
+            0 0 60px var(--tron-blue),
+            3px 3px 0 rgba(255, 0, 100, 0.5),
+            -3px -3px 0 rgba(0, 255, 255, 0.5);
+          filter: brightness(1);
+        }
+        50% {
+          text-shadow:
+            0 0 50px var(--tron-blue),
+            0 0 100px var(--tron-blue),
+            0 0 150px rgba(255, 0, 255, 0.3),
+            5px 5px 0 rgba(255, 0, 100, 0.6),
+            -5px -5px 0 rgba(0, 255, 255, 0.6);
+          filter: brightness(1.1);
+        }
+      }
+
+      @keyframes celebFloat {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-10px);
+        }
+      }
+
+      .celebration.active .celeb-title {
+        animation: fadeInSlide 1s ease forwards;
+      }
+
+      .celebration.active .celeb-sub {
+        animation: fadeInSlide 1s ease 0.5s forwards;
+        opacity: 0;
+      }
+
+      @keyframes fadeInSlide {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
         }
       }
     </style>
@@ -444,6 +613,13 @@
     <div class="crt-overlay"></div>
     <div class="crt-vignette"></div>
     <div class="crt-flicker"></div>
+
+    <!-- 축하 효과 오버레이 -->
+    <div class="celebration-overlay" id="celebrationOverlay">
+      <div class="light-rays"></div>
+      <div class="glow-pulse"></div>
+      <div class="floating-stars" id="floatingStars"></div>
+    </div>
 
     <!-- 파티클 배경 -->
     <div id="tsparticles"></div>
@@ -693,42 +869,106 @@
         updateSunrise(diff);
       }
 
+      function createFloatingStars() {
+        const container = document.getElementById("floatingStars");
+        const colors = ["#00d4ff", "#ffffff", "#ff00ff", "#ffdd00"];
+
+        for (let i = 0; i < 30; i++) {
+          const star = document.createElement("div");
+          star.className = "star";
+          star.style.left = Math.random() * 100 + "%";
+          star.style.animationDelay = Math.random() * 8 + "s";
+          star.style.animationDuration = 6 + Math.random() * 4 + "s";
+          star.style.background =
+            colors[Math.floor(Math.random() * colors.length)];
+          star.style.boxShadow = `0 0 ${4 + Math.random() * 6}px currentColor`;
+          container.appendChild(star);
+        }
+      }
+
       function showCelebration() {
         document.getElementById("countdown-screen").style.display = "none";
         document.getElementById("celebration-screen").classList.add("active");
 
+        // 축하 오버레이 활성화
+        document.getElementById("celebrationOverlay").classList.add("active");
+        createFloatingStars();
+
         const colors = ["#00d4ff", "#ffffff", "#ffdd00", "#ff00ff"];
-        const duration = 8000;
+
+        // 첫 번째 폭죽 - 중앙에서 크게
+        setTimeout(() => {
+          confetti({
+            particleCount: 100,
+            spread: 70,
+            origin: { y: 0.5, x: 0.5 },
+            colors: colors,
+            gravity: 0.8,
+            scalar: 1.2,
+          });
+        }, 100);
+
+        // 좌우에서 부드럽게
+        setTimeout(() => {
+          confetti({
+            particleCount: 50,
+            angle: 60,
+            spread: 60,
+            origin: { x: 0, y: 0.6 },
+            colors: colors,
+            gravity: 0.6,
+          });
+          confetti({
+            particleCount: 50,
+            angle: 120,
+            spread: 60,
+            origin: { x: 1, y: 0.6 },
+            colors: colors,
+            gravity: 0.6,
+          });
+        }, 500);
+
+        // 지속적인 부드러운 confetti (10초)
+        const duration = 10000;
         const end = Date.now() + duration;
 
         const frame = () => {
           confetti({
-            particleCount: 3,
+            particleCount: 2,
             angle: 60,
-            spread: 55,
-            origin: { x: 0 },
+            spread: 45,
+            origin: { x: 0, y: 0.7 },
             colors: colors,
+            gravity: 0.5,
+            drift: 1,
           });
           confetti({
-            particleCount: 3,
+            particleCount: 2,
             angle: 120,
-            spread: 55,
-            origin: { x: 1 },
+            spread: 45,
+            origin: { x: 1, y: 0.7 },
             colors: colors,
+            gravity: 0.5,
+            drift: -1,
           });
 
           if (Date.now() < end) {
             requestAnimationFrame(frame);
           }
         };
-        frame();
 
-        confetti({
-          particleCount: 150,
-          spread: 100,
-          origin: { y: 0.6 },
-          colors: colors,
-        });
+        setTimeout(frame, 1000);
+
+        // 추가 폭죽 웨이브
+        setTimeout(() => {
+          confetti({
+            particleCount: 80,
+            spread: 100,
+            origin: { y: 0.4 },
+            colors: colors,
+            gravity: 0.7,
+          });
+        }, 2000);
       }
 
       updateCurrentTime();
