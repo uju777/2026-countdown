@@ -34,10 +34,71 @@
         background: var(--black);
         min-height: 100vh;
         display: flex;
-        align-items: center;
+        align-items: flex-end;
         justify-content: center;
         overflow: hidden;
         color: #fff;
+      }
+
+      /* CRT 스캔라인 오버레이 */
+      .crt-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 1000;
+        background: repeating-linear-gradient(
+          0deg,
+          rgba(0, 0, 0, 0.15) 0px,
+          rgba(0, 0, 0, 0.15) 1px,
+          transparent 1px,
+          transparent 2px
+        );
+      }
+
+      /* CRT 비네트 효과 */
+      .crt-vignette {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 999;
+        background: radial-gradient(
+          ellipse at center,
+          transparent 0%,
+          transparent 60%,
+          rgba(0, 0, 0, 0.4) 100%
+        );
+      }
+
+      /* CRT 플리커 효과 */
+      .crt-flicker {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 998;
+        animation: flicker 0.15s infinite;
+        opacity: 0.03;
+        background: white;
+      }
+
+      @keyframes flicker {
+        0% {
+          opacity: 0.02;
+        }
+        50% {
+          opacity: 0.04;
+        }
+        100% {
+          opacity: 0.02;
+        }
       }
 
       /* 파티클 배경 */
@@ -60,18 +121,20 @@
       }
 
       .current-date {
-        font-size: 13px;
+        font-size: 12px;
         font-weight: 300;
-        color: rgba(255, 255, 255, 0.4);
+        color: rgba(0, 212, 255, 0.5);
         margin-bottom: 4px;
-        letter-spacing: 0.05em;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
       }
 
       .current-clock {
         font-family: "Orbitron", monospace;
-        font-size: 18px;
+        font-size: 16px;
         color: var(--tron-blue);
-        letter-spacing: 0.05em;
+        letter-spacing: 0.1em;
+        text-shadow: 0 0 10px var(--tron-blue);
       }
 
       /* 태양 */
@@ -159,55 +222,88 @@
         background: var(--tron-blue);
         box-shadow:
           0 0 20px var(--tron-blue),
-          0 0 40px var(--tron-blue);
+          0 0 40px var(--tron-blue),
+          0 0 60px var(--tron-blue);
         z-index: 4;
       }
 
+      /* 컨테이너 - 하단 지평선 근처 */
       .container {
-        position: relative;
+        position: fixed;
+        bottom: calc(40% + 20px);
+        left: 50%;
+        transform: translateX(-50%);
         z-index: 10;
         text-align: center;
         padding: 20px;
+        width: 100%;
+        max-width: 800px;
       }
 
       /* 메인 타이틀 */
       .title {
         font-family: "Orbitron", monospace;
-        font-size: clamp(60px, 18vw, 180px);
+        font-size: clamp(50px, 15vw, 140px);
         font-weight: 900;
-        color: var(--tron-blue);
-        letter-spacing: 0.1em;
+        color: #fff;
+        letter-spacing: 0.15em;
         line-height: 1;
-        margin-bottom: 20px;
-        text-shadow: 0 0 30px var(--tron-blue);
+        margin-bottom: 15px;
+        text-shadow:
+          0 0 20px var(--tron-blue),
+          0 0 40px var(--tron-blue),
+          0 0 60px var(--tron-blue),
+          2px 2px 0 rgba(255, 0, 100, 0.5),
+          -2px -2px 0 rgba(0, 255, 255, 0.5);
         opacity: 0;
-        transform: translateY(-30px);
+        transform: translateY(30px);
+        animation: chromatic 3s ease-in-out infinite;
+      }
+
+      @keyframes chromatic {
+        0%,
+        100% {
+          text-shadow:
+            0 0 20px var(--tron-blue),
+            0 0 40px var(--tron-blue),
+            2px 2px 0 rgba(255, 0, 100, 0.3),
+            -2px -2px 0 rgba(0, 255, 255, 0.3);
+        }
+        50% {
+          text-shadow:
+            0 0 30px var(--tron-blue),
+            0 0 50px var(--tron-blue),
+            3px 3px 0 rgba(255, 0, 100, 0.5),
+            -3px -3px 0 rgba(0, 255, 255, 0.5);
+        }
       }
 
       /* 카운트다운 텍스트 */
       .countdown-text {
-        font-size: clamp(18px, 5vw, 32px);
+        font-size: clamp(14px, 4vw, 24px);
         font-weight: 300;
-        color: rgba(255, 255, 255, 0.9);
-        letter-spacing: 0.05em;
-        margin-bottom: 30px;
+        color: rgba(255, 255, 255, 0.8);
+        letter-spacing: 0.15em;
+        margin-bottom: 20px;
         opacity: 0;
-        transform: translateY(-20px);
+        transform: translateY(20px);
+        text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
       }
 
       .countdown-text .time {
         font-family: "Orbitron", monospace;
         color: var(--tron-blue);
-        font-weight: 500;
+        font-weight: 700;
+        font-size: 1.2em;
+        text-shadow: 0 0 15px var(--tron-blue);
       }
 
       /* 하단 메시지 */
       .message {
-        margin-top: 30px;
-        font-size: clamp(16px, 4vw, 24px);
+        font-size: clamp(13px, 3.5vw, 18px);
         font-weight: 300;
-        color: rgba(255, 255, 255, 0.7);
-        letter-spacing: 0.12em;
+        color: rgba(255, 255, 255, 0.6);
+        letter-spacing: 0.1em;
         min-height: 1.5em;
         opacity: 0;
         transform: translateY(20px);
@@ -221,6 +317,7 @@
         margin-left: 2px;
         animation: cursorBlink 0.8s infinite;
         vertical-align: text-bottom;
+        box-shadow: 0 0 5px var(--tron-blue);
       }
 
       @keyframes cursorBlink {
@@ -254,28 +351,32 @@
       }
 
       .celeb-title {
-        font-size: clamp(24px, 6vw, 48px);
+        font-size: clamp(20px, 5vw, 36px);
         font-weight: 300;
         color: var(--tron-blue);
         letter-spacing: 0.5em;
-        margin-bottom: 20px;
+        margin-bottom: 15px;
         text-shadow: 0 0 20px var(--tron-blue);
       }
 
       .celeb-year {
         font-family: "Orbitron", monospace;
-        font-size: clamp(80px, 22vw, 220px);
+        font-size: clamp(60px, 18vw, 160px);
         font-weight: 900;
         color: #fff;
         line-height: 1;
-        text-shadow: 0 0 40px var(--tron-blue);
+        text-shadow:
+          0 0 30px var(--tron-blue),
+          0 0 60px var(--tron-blue),
+          3px 3px 0 rgba(255, 0, 100, 0.5),
+          -3px -3px 0 rgba(0, 255, 255, 0.5);
       }
 
       .celeb-sub {
-        font-size: clamp(18px, 5vw, 32px);
+        font-size: clamp(16px, 4vw, 28px);
         font-weight: 300;
         color: var(--tron-blue);
-        margin-top: 30px;
+        margin-top: 20px;
         letter-spacing: 0.3em;
       }
 
@@ -328,9 +429,22 @@
       .glitch:hover {
         animation: glitch 0.3s infinite;
       }
+
+      /* 반응형 */
+      @media (max-width: 600px) {
+        .container {
+          bottom: calc(40% + 10px);
+          padding: 15px;
+        }
+      }
     </style>
   </head>
   <body>
+    <!-- CRT 효과 오버레이 -->
+    <div class="crt-overlay"></div>
+    <div class="crt-vignette"></div>
+    <div class="crt-flicker"></div>
+
     <!-- 파티클 배경 -->
     <div id="tsparticles"></div>
 
@@ -375,24 +489,24 @@
       tsParticles.load("tsparticles", {
         particles: {
           number: {
-            value: 50,
+            value: 30,
             density: {
               enable: true,
               value_area: 800,
             },
           },
           color: {
-            value: ["#00d4ff", "#ffffff", "#0088aa"],
+            value: ["#00d4ff", "#ffffff", "#ff00ff"],
           },
           shape: {
             type: "circle",
           },
           opacity: {
-            value: 0.3,
+            value: 0.4,
             random: true,
             animation: {
               enable: true,
-              speed: 0.5,
+              speed: 0.3,
               minimumValue: 0.1,
               sync: false,
             },
@@ -402,50 +516,22 @@
             random: true,
             animation: {
               enable: true,
-              speed: 2,
+              speed: 1,
               minimumValue: 0.5,
               sync: false,
             },
           },
           links: {
-            enable: true,
-            distance: 150,
-            color: "#00d4ff",
-            opacity: 0.1,
-            width: 1,
+            enable: false,
           },
           move: {
             enable: true,
-            speed: 0.8,
+            speed: 0.5,
             direction: "none",
             random: true,
             straight: false,
             outModes: {
               default: "out",
-            },
-          },
-        },
-        interactivity: {
-          detectsOn: "canvas",
-          events: {
-            onHover: {
-              enable: true,
-              mode: "grab",
-            },
-            onClick: {
-              enable: true,
-              mode: "push",
-            },
-          },
-          modes: {
-            grab: {
-              distance: 140,
-              links: {
-                opacity: 0.5,
-              },
-            },
-            push: {
-              quantity: 4,
             },
           },
         },
@@ -456,7 +542,7 @@
       gsap.to(".title", {
         opacity: 1,
         y: 0,
-        duration: 1,
+        duration: 1.2,
         ease: "power3.out",
         delay: 0.3,
       });
@@ -466,7 +552,7 @@
         y: 0,
         duration: 1,
         ease: "power3.out",
-        delay: 0.5,
+        delay: 0.6,
       });
 
       gsap.to(".message", {
@@ -474,19 +560,17 @@
         y: 0,
         duration: 1,
         ease: "power3.out",
-        delay: 0.8,
+        delay: 0.9,
       });
 
       // 카운트다운 로직
       const newYear = new Date("2026-01-01T00:00:00+09:00");
       let celebrated = false;
 
-      // 1시간 = 3600초를 기준으로 태양 위치 계산 (마지막 1시간 동안 떠오름)
-      const SUNRISE_DURATION = 60 * 60 * 1000; // 1시간 (밀리초)
+      const SUNRISE_DURATION = 60 * 60 * 1000;
 
       const pad = (n) => String(n).padStart(2, "0");
 
-      // 명언 목록
       const quotes = [
         "지금 이 순간, 우리는 미래로 시간여행 중이다",
         "가장 긴 밤도 결국 새벽을 맞는다",
@@ -516,7 +600,6 @@
         const quoteEl = document.getElementById("quote");
         const quote = getRandomQuote();
 
-        // 지우기
         const currentText = quoteEl.textContent;
         for (let i = currentText.length; i >= 0; i--) {
           quoteEl.textContent = currentText.substring(0, i);
@@ -525,7 +608,6 @@
 
         await sleep(300);
 
-        // 타이핑
         for (let i = 0; i <= quote.length; i++) {
           quoteEl.textContent = quote.substring(0, i);
           await sleep(80);
@@ -565,18 +647,12 @@
         const sun = document.getElementById("sun");
         const skyGradient = document.getElementById("skyGradient");
 
-        // 마지막 1시간 동안 태양이 떠오름
         if (diff <= SUNRISE_DURATION && diff > 0) {
-          // 0 (자정) ~ 1 (1시간 전) 사이의 progress
           const progress = 1 - diff / SUNRISE_DURATION;
-
-          // 태양 위치: 지평선 아래(-150px)에서 지평선 위(+80px)까지
-          // 40%가 지평선이므로, 태양 중심이 지평선에 오면 반만 보임
-          const bottomPosition = -150 + progress * 230; // -150px ~ +80px
+          const bottomPosition = -150 + progress * 230;
           sun.style.bottom = `calc(40% + ${bottomPosition}px)`;
           sun.style.opacity = Math.min(1, progress * 1.5);
 
-          // 하늘 그라데이션
           const orangeOpacity = progress * 0.4;
           const pinkOpacity = progress * 0.2;
           skyGradient.style.background = `linear-gradient(
@@ -586,11 +662,9 @@
             rgba(255, 200, 150, 0) 100%
           )`;
         } else if (diff <= 0) {
-          // 자정이 지나면 태양 완전히 뜬 상태
           sun.style.bottom = `calc(40% + 80px)`;
           sun.style.opacity = 1;
         } else {
-          // 1시간 이전에는 태양 완전히 숨김 (지평선 아래)
           sun.style.bottom = `calc(40% - 150px)`;
           sun.style.opacity = 0;
         }
@@ -610,14 +684,12 @@
           return;
         }
 
-        // 분, 초 계산
         const totalMins = Math.floor(diff / (1000 * 60));
         const secs = Math.floor((diff % (1000 * 60)) / 1000);
 
         document.getElementById("timeLeft").textContent =
           `${totalMins}분 ${secs}초`;
 
-        // 태양 떠오르기 효과
         updateSunrise(diff);
       }
 
@@ -625,7 +697,7 @@
         document.getElementById("countdown-screen").style.display = "none";
         document.getElementById("celebration-screen").classList.add("active");
 
-        const colors = ["#00d4ff", "#ffffff", "#ffdd00", "#ff6600"];
+        const colors = ["#00d4ff", "#ffffff", "#ffdd00", "#ff00ff"];
         const duration = 8000;
         const end = Date.now() + duration;
 
@@ -659,7 +731,6 @@
         });
       }
 
-      // 초기화 및 업데이트
       updateCurrentTime();
       updateCountdown();
       setTimeout(typeQuote, 1500);
@@ -669,7 +740,6 @@
         updateCountdown();
       }, 1000);
 
-      // 8초마다 명언 로테이션
       setInterval(typeQuote, 8000);
     </script>
   </body>
