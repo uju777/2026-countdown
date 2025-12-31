@@ -79,16 +79,20 @@
         position: fixed;
         left: 50%;
         transform: translateX(-50%);
+        bottom: calc(40% - 150px);
         width: 80px;
         height: 80px;
         background: radial-gradient(circle, #ffee00 0%, #ff6600 100%);
         border-radius: 50%;
-        z-index: 2;
+        z-index: 3;
         box-shadow:
           0 0 60px 30px rgba(255, 200, 0, 0.4),
           0 0 100px 60px rgba(255, 150, 0, 0.2),
           0 0 140px 90px rgba(255, 100, 0, 0.1);
-        transition: bottom 0.5s ease-out;
+        transition:
+          bottom 1s ease-out,
+          opacity 1s ease-out;
+        opacity: 0;
       }
 
       /* 하늘 그라데이션 */
@@ -566,10 +570,11 @@
           // 0 (자정) ~ 1 (1시간 전) 사이의 progress
           const progress = 1 - diff / SUNRISE_DURATION;
 
-          // 태양 위치: 지평선 아래(-100px)에서 지평선 위(calc(40% + 50px))까지
-          const bottomPosition = -100 + progress * 200; // -100px ~ 100px
+          // 태양 위치: 지평선 아래(-150px)에서 지평선 위(+80px)까지
+          // 40%가 지평선이므로, 태양 중심이 지평선에 오면 반만 보임
+          const bottomPosition = -150 + progress * 230; // -150px ~ +80px
           sun.style.bottom = `calc(40% + ${bottomPosition}px)`;
-          sun.style.opacity = Math.min(1, progress * 2);
+          sun.style.opacity = Math.min(1, progress * 1.5);
 
           // 하늘 그라데이션
           const orangeOpacity = progress * 0.4;
@@ -582,11 +587,11 @@
           )`;
         } else if (diff <= 0) {
           // 자정이 지나면 태양 완전히 뜬 상태
-          sun.style.bottom = `calc(40% + 100px)`;
+          sun.style.bottom = `calc(40% + 80px)`;
           sun.style.opacity = 1;
         } else {
-          // 1시간 이전에는 태양 숨김
-          sun.style.bottom = `calc(40% - 100px)`;
+          // 1시간 이전에는 태양 완전히 숨김 (지평선 아래)
+          sun.style.bottom = `calc(40% - 150px)`;
           sun.style.opacity = 0;
         }
       }
