@@ -234,17 +234,17 @@
 
       .current-date {
         font-family: var(--pixel-font);
-        font-size: 8px;
-        color: rgba(0, 212, 255, 0.6);
-        margin-bottom: 4px;
-        letter-spacing: 0.05em;
+        font-size: clamp(10px, 2vw, 12px);
+        color: rgba(0, 212, 255, 0.7);
+        margin-bottom: 5px;
+        letter-spacing: 0.03em;
       }
 
       .current-clock {
         font-family: var(--pixel-font-en);
-        font-size: 12px;
+        font-size: clamp(14px, 3vw, 18px);
         color: var(--tron-blue);
-        letter-spacing: 0.1em;
+        letter-spacing: 0.08em;
         text-shadow: 0 0 10px var(--tron-blue);
       }
 
@@ -354,12 +354,12 @@
       /* 메인 타이틀 */
       .title {
         font-family: var(--pixel-font-en);
-        font-size: clamp(36px, 12vw, 80px);
+        font-size: clamp(42px, 14vw, 90px);
         font-weight: 400;
         color: #fff;
         letter-spacing: 0.1em;
         line-height: 1;
-        margin-bottom: 15px;
+        margin-bottom: 18px;
         text-shadow:
           0 0 20px var(--tron-blue),
           0 0 40px var(--tron-blue),
@@ -392,32 +392,33 @@
       /* 카운트다운 텍스트 */
       .countdown-text {
         font-family: var(--pixel-font);
-        font-size: clamp(10px, 2.5vw, 14px);
-        color: rgba(255, 255, 255, 0.8);
+        font-size: clamp(14px, 3.5vw, 20px);
+        color: rgba(255, 255, 255, 0.9);
         letter-spacing: 0.05em;
-        margin-bottom: 15px;
+        margin-bottom: 18px;
         opacity: 0;
         transform: translateY(20px);
         text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+        line-height: 1.5;
       }
 
       .countdown-text .time {
         font-family: var(--pixel-font-en);
         color: var(--tron-blue);
-        font-size: 1.1em;
+        font-size: 1.15em;
         text-shadow: 0 0 15px var(--tron-blue);
       }
 
       /* 하단 메시지 */
       .message {
         font-family: var(--pixel-font);
-        font-size: clamp(9px, 2vw, 12px);
-        color: rgba(255, 255, 255, 0.6);
-        letter-spacing: 0.05em;
+        font-size: clamp(13px, 3vw, 18px);
+        color: rgba(255, 255, 255, 0.75);
+        letter-spacing: 0.03em;
         min-height: 1.5em;
         opacity: 0;
         transform: translateY(20px);
-        line-height: 1.6;
+        line-height: 1.7;
       }
 
       .message .text-cursor {
@@ -463,16 +464,16 @@
 
       .celeb-title {
         font-family: var(--pixel-font);
-        font-size: clamp(10px, 2.5vw, 16px);
+        font-size: clamp(14px, 3.5vw, 22px);
         color: var(--tron-blue);
-        letter-spacing: 0.2em;
-        margin-bottom: 10px;
+        letter-spacing: 0.15em;
+        margin-bottom: 12px;
         text-shadow: 0 0 20px var(--tron-blue);
       }
 
       .celeb-year {
         font-family: var(--pixel-font-en);
-        font-size: clamp(40px, 14vw, 90px);
+        font-size: clamp(48px, 16vw, 100px);
         color: #fff;
         line-height: 1;
         text-shadow:
@@ -484,10 +485,10 @@
 
       .celeb-sub {
         font-family: var(--pixel-font);
-        font-size: clamp(10px, 2.5vw, 14px);
+        font-size: clamp(13px, 3vw, 18px);
         color: var(--tron-blue);
-        margin-top: 15px;
-        letter-spacing: 0.15em;
+        margin-top: 18px;
+        letter-spacing: 0.1em;
       }
 
       /* 글리치 효과 */
@@ -543,25 +544,31 @@
       /* 반응형 */
       @media (max-width: 600px) {
         body {
-          padding: 10px;
+          padding: 8px;
         }
         .crt-monitor {
-          padding: 12px;
-          border-radius: 15px;
+          padding: 10px;
+          border-radius: 12px;
         }
         .container {
-          bottom: 5%;
-          padding: 10px;
+          bottom: 4%;
+          padding: 8px;
         }
         .current-time {
-          top: 8px;
-          right: 10px;
+          top: 6px;
+          right: 8px;
         }
         .current-date {
-          font-size: 6px;
+          font-size: 9px;
         }
         .current-clock {
-          font-size: 10px;
+          font-size: 12px;
+        }
+        .title {
+          margin-bottom: 12px;
+        }
+        .countdown-text {
+          margin-bottom: 12px;
         }
       }
 
