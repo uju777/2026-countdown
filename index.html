@@ -1,0 +1,799 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>2026 카운트다운 | 새해가 밝아옵니다</title>
+    <meta
+      name="description"
+      content="2026년 새해 카운트다운 - 함께 새로운 시작을 맞이하세요"
+    />
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Noto+Sans+KR:wght@300;400;700;900&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tsparticles-confetti@3.0.3/tsparticles.confetti.bundle.min.js"></script>
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      :root {
+        --neon-cyan: #00fff2;
+        --neon-pink: #ff00ff;
+        --neon-purple: #b700ff;
+        --neon-blue: #0066ff;
+        --dark-bg: #0a0a0f;
+        --grid-color: rgba(0, 255, 242, 0.1);
+      }
+
+      body {
+        font-family: "Noto Sans KR", sans-serif;
+        background: var(--dark-bg);
+        min-height: 100vh;
+        overflow-x: hidden;
+        position: relative;
+      }
+
+      /* 사이버펑크 그리드 배경 */
+      .cyber-grid {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background:
+          linear-gradient(90deg, var(--grid-color) 1px, transparent 1px),
+          linear-gradient(var(--grid-color) 1px, transparent 1px);
+        background-size: 50px 50px;
+        animation: gridMove 20s linear infinite;
+        z-index: 0;
+      }
+
+      @keyframes gridMove {
+        0% {
+          transform: perspective(500px) rotateX(60deg) translateY(0);
+        }
+        100% {
+          transform: perspective(500px) rotateX(60deg) translateY(50px);
+        }
+      }
+
+      /* 글로우 오버레이 */
+      .glow-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background:
+          radial-gradient(
+            ellipse at 50% 0%,
+            rgba(0, 255, 242, 0.15) 0%,
+            transparent 50%
+          ),
+          radial-gradient(
+            ellipse at 0% 100%,
+            rgba(255, 0, 255, 0.1) 0%,
+            transparent 40%
+          ),
+          radial-gradient(
+            ellipse at 100% 100%,
+            rgba(183, 0, 255, 0.1) 0%,
+            transparent 40%
+          );
+        z-index: 1;
+        pointer-events: none;
+      }
+
+      /* 스캔라인 효과 */
+      .scanlines {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: repeating-linear-gradient(
+          0deg,
+          rgba(0, 0, 0, 0.1) 0px,
+          rgba(0, 0, 0, 0.1) 1px,
+          transparent 1px,
+          transparent 2px
+        );
+        z-index: 2;
+        pointer-events: none;
+        animation: scanline 8s linear infinite;
+      }
+
+      @keyframes scanline {
+        0% {
+          transform: translateY(0);
+        }
+        100% {
+          transform: translateY(4px);
+        }
+      }
+
+      /* 메인 컨테이너 */
+      .container {
+        position: relative;
+        z-index: 10;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+
+      /* 헤더 텍스트 */
+      .header {
+        text-align: center;
+        margin-bottom: 40px;
+      }
+
+      .year-label {
+        font-family: "Orbitron", monospace;
+        font-size: clamp(48px, 15vw, 120px);
+        font-weight: 900;
+        color: transparent;
+        background: linear-gradient(
+          180deg,
+          var(--neon-cyan) 0%,
+          var(--neon-pink) 100%
+        );
+        -webkit-background-clip: text;
+        background-clip: text;
+        text-shadow:
+          0 0 20px rgba(0, 255, 242, 0.5),
+          0 0 40px rgba(0, 255, 242, 0.3),
+          0 0 60px rgba(255, 0, 255, 0.2);
+        animation: textGlow 2s ease-in-out infinite alternate;
+        letter-spacing: 0.1em;
+      }
+
+      @keyframes textGlow {
+        0% {
+          filter: brightness(1);
+        }
+        100% {
+          filter: brightness(1.3);
+        }
+      }
+
+      .subtitle {
+        font-size: clamp(16px, 4vw, 24px);
+        color: rgba(255, 255, 255, 0.7);
+        margin-top: 10px;
+        font-weight: 300;
+        letter-spacing: 0.3em;
+        text-transform: uppercase;
+      }
+
+      /* 카운트다운 컨테이너 */
+      .countdown-container {
+        background: linear-gradient(
+          135deg,
+          rgba(10, 10, 15, 0.9) 0%,
+          rgba(20, 20, 35, 0.9) 100%
+        );
+        border: 1px solid rgba(0, 255, 242, 0.3);
+        border-radius: 20px;
+        padding: 40px 50px;
+        box-shadow:
+          0 0 30px rgba(0, 255, 242, 0.2),
+          inset 0 0 30px rgba(0, 255, 242, 0.05);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .countdown-container::before {
+        content: "";
+        position: absolute;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        background: linear-gradient(
+          45deg,
+          var(--neon-cyan),
+          var(--neon-pink),
+          var(--neon-purple),
+          var(--neon-cyan)
+        );
+        background-size: 400% 400%;
+        border-radius: 22px;
+        z-index: -1;
+        animation: borderGlow 4s ease infinite;
+        opacity: 0.5;
+      }
+
+      @keyframes borderGlow {
+        0%,
+        100% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+      }
+
+      /* 플립 카드 스타일 카운트다운 */
+      .countdown {
+        display: flex;
+        gap: 15px;
+        align-items: center;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+
+      .time-block {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .flip-card {
+        position: relative;
+        width: clamp(70px, 18vw, 120px);
+        height: clamp(90px, 22vw, 150px);
+        perspective: 1000px;
+      }
+
+      .flip-card-inner {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(180deg, #1a1a2e 0%, #0f0f1a 100%);
+        border-radius: 10px;
+        border: 2px solid rgba(0, 255, 242, 0.4);
+        box-shadow:
+          0 0 20px rgba(0, 255, 242, 0.3),
+          inset 0 0 20px rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+      }
+
+      .flip-card-inner::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 2;
+      }
+
+      .flip-card-inner::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 5px;
+        right: 5px;
+        height: 1px;
+        background: rgba(0, 255, 242, 0.2);
+        z-index: 3;
+      }
+
+      .number {
+        font-family: "Orbitron", monospace;
+        font-size: clamp(36px, 10vw, 72px);
+        font-weight: 900;
+        color: var(--neon-cyan);
+        text-shadow:
+          0 0 10px var(--neon-cyan),
+          0 0 20px var(--neon-cyan),
+          0 0 40px var(--neon-cyan);
+        transition: all 0.1s ease;
+      }
+
+      .number.changing {
+        animation: numberChange 0.3s ease;
+      }
+
+      @keyframes numberChange {
+        0% {
+          transform: scaleY(1);
+          opacity: 1;
+        }
+        50% {
+          transform: scaleY(0);
+          opacity: 0;
+        }
+        100% {
+          transform: scaleY(1);
+          opacity: 1;
+        }
+      }
+
+      .label {
+        font-size: clamp(12px, 3vw, 16px);
+        color: rgba(255, 255, 255, 0.6);
+        text-transform: uppercase;
+        letter-spacing: 0.2em;
+        font-weight: 700;
+      }
+
+      /* 구분자 */
+      .separator {
+        font-family: "Orbitron", monospace;
+        font-size: clamp(36px, 10vw, 72px);
+        color: var(--neon-pink);
+        text-shadow: 0 0 20px var(--neon-pink);
+        animation: blink 1s ease-in-out infinite;
+        margin-bottom: 30px;
+      }
+
+      @keyframes blink {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.3;
+        }
+      }
+
+      /* 메시지 */
+      .message {
+        text-align: center;
+        margin-top: 50px;
+        color: rgba(255, 255, 255, 0.8);
+      }
+
+      .message-main {
+        font-size: clamp(18px, 5vw, 32px);
+        font-weight: 700;
+        margin-bottom: 15px;
+        background: linear-gradient(90deg, var(--neon-cyan), var(--neon-pink));
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+
+      .message-sub {
+        font-size: clamp(14px, 3.5vw, 18px);
+        font-weight: 300;
+        color: rgba(255, 255, 255, 0.5);
+        line-height: 1.8;
+      }
+
+      /* 새해 축하 화면 */
+      .celebration {
+        display: none;
+        text-align: center;
+        animation: fadeIn 1s ease;
+      }
+
+      .celebration.active {
+        display: block;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: scale(0.8);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+
+      .celebration-title {
+        font-family: "Orbitron", monospace;
+        font-size: clamp(36px, 12vw, 100px);
+        font-weight: 900;
+        background: linear-gradient(
+          180deg,
+          #fff 0%,
+          var(--neon-cyan) 50%,
+          var(--neon-pink) 100%
+        );
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        animation: celebrationGlow 0.5s ease infinite alternate;
+        text-shadow:
+          0 0 30px rgba(255, 255, 255, 0.5),
+          0 0 60px rgba(0, 255, 242, 0.5);
+      }
+
+      @keyframes celebrationGlow {
+        0% {
+          filter: brightness(1) drop-shadow(0 0 20px rgba(0, 255, 242, 0.8));
+        }
+        100% {
+          filter: brightness(1.5) drop-shadow(0 0 40px rgba(255, 0, 255, 0.8));
+        }
+      }
+
+      .celebration-subtitle {
+        font-size: clamp(20px, 6vw, 36px);
+        color: #fff;
+        margin-top: 20px;
+        font-weight: 300;
+      }
+
+      .celebration-year {
+        font-family: "Orbitron", monospace;
+        font-size: clamp(60px, 20vw, 180px);
+        font-weight: 900;
+        color: var(--neon-cyan);
+        text-shadow:
+          0 0 30px var(--neon-cyan),
+          0 0 60px var(--neon-cyan),
+          0 0 90px var(--neon-pink);
+        animation: yearPulse 1s ease infinite;
+        margin-top: 20px;
+      }
+
+      @keyframes yearPulse {
+        0%,
+        100% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.05);
+        }
+      }
+
+      /* 파티클 캔버스 */
+      #particles-canvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 5;
+        pointer-events: none;
+      }
+
+      /* 반응형 */
+      @media (max-width: 600px) {
+        .countdown-container {
+          padding: 25px 20px;
+        }
+
+        .countdown {
+          gap: 8px;
+        }
+
+        .separator {
+          margin-bottom: 25px;
+          font-size: 28px;
+        }
+
+        .time-block {
+          gap: 6px;
+        }
+      }
+
+      /* 하단 크레딧 */
+      .footer {
+        position: fixed;
+        bottom: 20px;
+        left: 0;
+        right: 0;
+        text-align: center;
+        color: rgba(255, 255, 255, 0.3);
+        font-size: 12px;
+        z-index: 10;
+      }
+
+      .footer a {
+        color: rgba(0, 255, 242, 0.5);
+        text-decoration: none;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- 배경 효과 -->
+    <div class="cyber-grid"></div>
+    <div class="glow-overlay"></div>
+    <div class="scanlines"></div>
+    <canvas id="particles-canvas"></canvas>
+
+    <div class="container">
+      <!-- 카운트다운 화면 -->
+      <div id="countdown-screen">
+        <header class="header">
+          <h1 class="year-label">2026</h1>
+          <p class="subtitle">새해가 밝아옵니다</p>
+        </header>
+
+        <div class="countdown-container">
+          <div class="countdown">
+            <div class="time-block">
+              <div class="flip-card">
+                <div class="flip-card-inner">
+                  <span class="number" id="days">00</span>
+                </div>
+              </div>
+              <span class="label">일</span>
+            </div>
+
+            <span class="separator">:</span>
+
+            <div class="time-block">
+              <div class="flip-card">
+                <div class="flip-card-inner">
+                  <span class="number" id="hours">00</span>
+                </div>
+              </div>
+              <span class="label">시간</span>
+            </div>
+
+            <span class="separator">:</span>
+
+            <div class="time-block">
+              <div class="flip-card">
+                <div class="flip-card-inner">
+                  <span class="number" id="minutes">00</span>
+                </div>
+              </div>
+              <span class="label">분</span>
+            </div>
+
+            <span class="separator">:</span>
+
+            <div class="time-block">
+              <div class="flip-card">
+                <div class="flip-card-inner">
+                  <span class="number" id="seconds">00</span>
+                </div>
+              </div>
+              <span class="label">초</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="message">
+          <p class="message-main">새로운 시작, 새로운 희망</p>
+          <p class="message-sub">
+            2026년, 당신의 모든 꿈이 이루어지길<br />
+            함께 새해를 맞이해요
+          </p>
+        </div>
+      </div>
+
+      <!-- 새해 축하 화면 -->
+      <div id="celebration-screen" class="celebration">
+        <h1 class="celebration-title">새해 복 많이 받으세요!</h1>
+        <p class="celebration-subtitle">HAPPY NEW YEAR</p>
+        <div class="celebration-year">2026</div>
+      </div>
+    </div>
+
+    <footer class="footer">Made with love in Korea</footer>
+
+    <script>
+      // 2026년 1월 1일 00:00:00 KST
+      const newYear = new Date("2026-01-01T00:00:00+09:00");
+
+      // 이전 값 저장 (애니메이션용)
+      let lastDays = -1,
+        lastHours = -1,
+        lastMins = -1,
+        lastSecs = -1;
+      let celebrated = false;
+
+      // 숫자 패딩
+      const pad = (num) => String(num).padStart(2, "0");
+
+      // 숫자 변경 애니메이션
+      function animateNumber(element, newValue) {
+        if (element.textContent !== newValue) {
+          element.classList.add("changing");
+          setTimeout(() => {
+            element.textContent = newValue;
+            element.classList.remove("changing");
+          }, 150);
+        }
+      }
+
+      // 카운트다운 업데이트
+      function updateCountdown() {
+        const now = new Date();
+        const diff = newYear - now;
+
+        if (diff <= 0) {
+          // 새해!
+          document.getElementById("days").textContent = "00";
+          document.getElementById("hours").textContent = "00";
+          document.getElementById("minutes").textContent = "00";
+          document.getElementById("seconds").textContent = "00";
+
+          if (!celebrated) {
+            celebrated = true;
+            showCelebration();
+          }
+          return;
+        }
+
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor(
+          (diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60),
+        );
+        const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const secs = Math.floor((diff % (1000 * 60)) / 1000);
+
+        // 애니메이션 적용
+        const daysEl = document.getElementById("days");
+        const hoursEl = document.getElementById("hours");
+        const minsEl = document.getElementById("minutes");
+        const secsEl = document.getElementById("seconds");
+
+        if (days !== lastDays) {
+          animateNumber(daysEl, pad(days));
+          lastDays = days;
+        }
+        if (hours !== lastHours) {
+          animateNumber(hoursEl, pad(hours));
+          lastHours = hours;
+        }
+        if (mins !== lastMins) {
+          animateNumber(minsEl, pad(mins));
+          lastMins = mins;
+        }
+        if (secs !== lastSecs) {
+          animateNumber(secsEl, pad(secs));
+          lastSecs = secs;
+        }
+
+        // 마지막 10초 특별 효과
+        if (days === 0 && hours === 0 && mins === 0 && secs <= 10 && secs > 0) {
+          document.body.style.background = `hsl(${secs * 30}, 70%, 5%)`;
+          secsEl.style.transform = `scale(${1 + (10 - secs) * 0.05})`;
+        }
+      }
+
+      // 새해 축하 효과
+      function showCelebration() {
+        document.getElementById("countdown-screen").style.display = "none";
+        document.getElementById("celebration-screen").classList.add("active");
+
+        // 연속 폭죽 효과
+        const duration = 15 * 1000;
+        const animationEnd = Date.now() + duration;
+        const defaults = {
+          startVelocity: 30,
+          spread: 360,
+          ticks: 60,
+          zIndex: 100,
+        };
+
+        function randomInRange(min, max) {
+          return Math.random() * (max - min) + min;
+        }
+
+        const interval = setInterval(function () {
+          const timeLeft = animationEnd - Date.now();
+
+          if (timeLeft <= 0) {
+            return clearInterval(interval);
+          }
+
+          const particleCount = 50 * (timeLeft / duration);
+
+          // 양쪽에서 발사
+          confetti({
+            ...defaults,
+            particleCount,
+            origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 },
+            colors: ["#00fff2", "#ff00ff", "#b700ff", "#ffffff", "#ffff00"],
+          });
+          confetti({
+            ...defaults,
+            particleCount,
+            origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 },
+            colors: ["#00fff2", "#ff00ff", "#b700ff", "#ffffff", "#ffff00"],
+          });
+        }, 250);
+
+        // 중앙 대형 폭발
+        setTimeout(() => {
+          confetti({
+            particleCount: 200,
+            spread: 100,
+            origin: { y: 0.6 },
+            colors: ["#00fff2", "#ff00ff", "#ffffff"],
+          });
+        }, 500);
+      }
+
+      // 배경 파티클 효과
+      function initParticles() {
+        const canvas = document.getElementById("particles-canvas");
+        const ctx = canvas.getContext("2d");
+        let particles = [];
+
+        function resize() {
+          canvas.width = window.innerWidth;
+          canvas.height = window.innerHeight;
+        }
+        resize();
+        window.addEventListener("resize", resize);
+
+        class Particle {
+          constructor() {
+            this.reset();
+          }
+
+          reset() {
+            this.x = Math.random() * canvas.width;
+            this.y = Math.random() * canvas.height;
+            this.size = Math.random() * 2 + 0.5;
+            this.speedY = Math.random() * 0.5 + 0.1;
+            this.opacity = Math.random() * 0.5 + 0.2;
+            this.color = Math.random() > 0.5 ? "#00fff2" : "#ff00ff";
+          }
+
+          update() {
+            this.y -= this.speedY;
+            this.opacity -= 0.001;
+
+            if (this.y < 0 || this.opacity <= 0) {
+              this.reset();
+              this.y = canvas.height;
+              this.opacity = Math.random() * 0.5 + 0.2;
+            }
+          }
+
+          draw() {
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fillStyle = this.color;
+            ctx.globalAlpha = this.opacity;
+            ctx.fill();
+            ctx.globalAlpha = 1;
+          }
+        }
+
+        // 파티클 생성
+        for (let i = 0; i < 100; i++) {
+          particles.push(new Particle());
+        }
+
+        function animate() {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          particles.forEach((p) => {
+            p.update();
+            p.draw();
+          });
+          requestAnimationFrame(animate);
+        }
+
+        animate();
+      }
+
+      // 초기화
+      updateCountdown();
+      setInterval(updateCountdown, 1000);
+      initParticles();
+
+      // 오디오 컨텍스트 (클릭 시 활성화)
+      document.addEventListener(
+        "click",
+        () => {
+          // 필요 시 배경음악 추가 가능
+        },
+        { once: true },
+      );
+    </script>
+  </body>
+</html>
