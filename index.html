@@ -216,7 +216,29 @@
         font-size: clamp(14px, 3.5vw, 20px);
         font-weight: 300;
         color: rgba(255, 255, 255, 0.5);
-        letter-spacing: 0.15em;
+        letter-spacing: 0.08em;
+        min-height: 1.5em;
+      }
+
+      .message .cursor {
+        display: inline-block;
+        width: 2px;
+        height: 1em;
+        background: var(--tron-blue);
+        margin-left: 2px;
+        animation: cursorBlink 0.8s infinite;
+        vertical-align: text-bottom;
+      }
+
+      @keyframes cursorBlink {
+        0%,
+        50% {
+          opacity: 1;
+        }
+        51%,
+        100% {
+          opacity: 0;
+        }
       }
 
       /* 축하 화면 */
@@ -317,7 +339,9 @@
           </div>
         </div>
 
-        <p class="message">끝은 언제나 새로운 시작이다</p>
+        <p class="message">
+          <span id="quote"></span><span class="cursor"></span>
+        </p>
       </div>
 
       <div id="celebration-screen" class="celebration">
@@ -332,6 +356,65 @@
       let celebrated = false;
 
       const pad = (n) => String(n).padStart(2, "0");
+
+      // 명언 목록
+      const quotes = [
+        "끝은 언제나 새로운 시작이다",
+        "지금 이 순간이 가장 젊은 날이다",
+        "변하지 않으면 사라진다",
+        "오늘 하지 않으면 내일도 없다",
+        "두려움은 허상이다",
+        "포기하는 순간이 진짜 끝이다",
+        "완벽한 때란 없다, 지금이 그때다",
+        "어제의 나는 오늘의 적이다",
+        "불편함 없이 성장은 없다",
+        "남들이 쉴 때가 기회다",
+        "생각이 바뀌면 세상이 바뀐다",
+        "실패는 데이터일 뿐이다",
+        "시간은 되돌릴 수 없다",
+        "결국 하는 사람이 해낸다",
+      ];
+
+      let currentQuoteIndex = -1;
+      let isTyping = false;
+
+      function getRandomQuote() {
+        let newIndex;
+        do {
+          newIndex = Math.floor(Math.random() * quotes.length);
+        } while (newIndex === currentQuoteIndex && quotes.length > 1);
+        currentQuoteIndex = newIndex;
+        return quotes[newIndex];
+      }
+
+      async function typeQuote() {
+        if (isTyping) return;
+        isTyping = true;
+
+        const quoteEl = document.getElementById("quote");
+        const quote = getRandomQuote();
+
+        // 지우기
+        const currentText = quoteEl.textContent;
+        for (let i = currentText.length; i >= 0; i--) {
+          quoteEl.textContent = currentText.substring(0, i);
+          await sleep(30);
+        }
+
+        await sleep(300);
+
+        // 타이핑
+        for (let i = 0; i <= quote.length; i++) {
+          quoteEl.textContent = quote.substring(0, i);
+          await sleep(80);
+        }
+
+        isTyping = false;
+      }
+
+      function sleep(ms) {
+        return new Promise((resolve) => setTimeout(resolve, ms));
+      }
 
       const weekdays = [
         "일요일",
@@ -423,10 +506,15 @@
       // 초기화 및 업데이트
       updateCurrentTime();
       updateCountdown();
+      typeQuote(); // 첫 명언
+
       setInterval(() => {
         updateCurrentTime();
         updateCountdown();
       }, 1000);
+
+      // 8초마다 명언 로테이션
+      setInterval(typeQuote, 8000);
     </script>
   </body>
 </html>
