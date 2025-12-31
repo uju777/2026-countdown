@@ -8,13 +8,12 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Noto+Sans+KR:wght@200;300;400;500;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=DotGothic16&display=swap"
       rel="stylesheet"
     />
 
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/tsparticles@2.12.0/tsparticles.bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 
     <style>
       * {
@@ -26,23 +25,124 @@
       :root {
         --tron-blue: #00d4ff;
         --black: #000;
-        --sun-color: #ffdd00;
+        --pixel-font: "DotGothic16", "Press Start 2P", monospace;
+        --pixel-font-en: "Press Start 2P", monospace;
       }
 
       body {
-        font-family: "Noto Sans KR", sans-serif;
-        background: var(--black);
+        font-family: var(--pixel-font);
+        background: #0a0a0a;
         min-height: 100vh;
         display: flex;
-        align-items: flex-end;
+        align-items: center;
         justify-content: center;
         overflow: hidden;
         color: #fff;
+        padding: 15px;
       }
 
-      /* CRT 스캔라인 오버레이 */
+      /* CRT 모니터 프레임 */
+      .crt-monitor {
+        position: relative;
+        width: 100%;
+        max-width: 900px;
+        aspect-ratio: 4 / 3;
+        background: linear-gradient(
+          145deg,
+          #2a2a2a 0%,
+          #1a1a1a 50%,
+          #0d0d0d 100%
+        );
+        border-radius: 20px;
+        padding: 20px;
+        box-shadow:
+          0 0 0 3px #333,
+          0 0 0 6px #1a1a1a,
+          0 20px 60px rgba(0, 0, 0, 0.8),
+          inset 0 2px 10px rgba(255, 255, 255, 0.05);
+      }
+
+      .crt-monitor::before {
+        content: "";
+        position: absolute;
+        top: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 8px;
+        height: 8px;
+        background: #333;
+        border-radius: 50%;
+        box-shadow:
+          -20px 0 0 #333,
+          20px 0 0 #333;
+      }
+
+      .crt-screen {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        background: var(--black);
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow:
+          inset 0 0 100px rgba(0, 212, 255, 0.03),
+          inset 0 0 20px rgba(0, 0, 0, 0.8);
+      }
+
+      .crt-screen::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: radial-gradient(
+          ellipse at center,
+          transparent 0%,
+          transparent 70%,
+          rgba(0, 0, 0, 0.3) 100%
+        );
+        pointer-events: none;
+        z-index: 1001;
+        border-radius: 10px;
+      }
+
+      .crt-base {
+        position: absolute;
+        bottom: -30px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 60%;
+        height: 25px;
+        background: linear-gradient(180deg, #1a1a1a 0%, #0d0d0d 100%);
+        border-radius: 0 0 10px 10px;
+      }
+
+      .power-led {
+        position: absolute;
+        bottom: 8px;
+        right: 25px;
+        width: 6px;
+        height: 6px;
+        background: #00ff00;
+        border-radius: 50%;
+        box-shadow: 0 0 8px #00ff00;
+        animation: ledBlink 2s ease-in-out infinite;
+      }
+
+      @keyframes ledBlink {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.6;
+        }
+      }
+
+      /* CRT 효과 */
       .crt-overlay {
-        position: fixed;
+        position: absolute;
         top: 0;
         left: 0;
         width: 100%;
@@ -56,11 +156,11 @@
           transparent 1px,
           transparent 2px
         );
+        border-radius: 10px;
       }
 
-      /* CRT 비네트 효과 */
       .crt-vignette {
-        position: fixed;
+        position: absolute;
         top: 0;
         left: 0;
         width: 100%;
@@ -73,39 +173,38 @@
           transparent 60%,
           rgba(0, 0, 0, 0.4) 100%
         );
+        border-radius: 10px;
       }
 
-      /* 파티클 배경 */
       #tsparticles {
-        position: fixed;
+        position: absolute;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
         z-index: 1;
+        border-radius: 10px;
       }
 
-      /* 태양 - 떠오른 상태 */
       .sun {
-        position: fixed;
+        position: absolute;
         left: 50%;
         transform: translateX(-50%);
-        bottom: calc(40% + 80px);
-        width: 80px;
-        height: 80px;
+        bottom: calc(40% + 50px);
+        width: 60px;
+        height: 60px;
         background: radial-gradient(circle, #ffee00 0%, #ff6600 100%);
         border-radius: 50%;
         z-index: 3;
         box-shadow:
-          0 0 60px 30px rgba(255, 200, 0, 0.4),
-          0 0 100px 60px rgba(255, 150, 0, 0.2),
-          0 0 140px 90px rgba(255, 100, 0, 0.1);
+          0 0 40px 20px rgba(255, 200, 0, 0.4),
+          0 0 80px 40px rgba(255, 150, 0, 0.2),
+          0 0 120px 60px rgba(255, 100, 0, 0.1);
         opacity: 1;
       }
 
-      /* 하늘 그라데이션 - 일출 상태 */
       .sky-gradient {
-        position: fixed;
+        position: absolute;
         bottom: 40%;
         left: 0;
         right: 0;
@@ -120,9 +219,8 @@
         pointer-events: none;
       }
 
-      /* 트론 그리드 바닥 */
       .tron-grid {
-        position: fixed;
+        position: absolute;
         bottom: 0;
         left: -50%;
         width: 200%;
@@ -137,7 +235,7 @@
           ),
           linear-gradient(0deg, rgba(0, 212, 255, 0.3) 0%, transparent 100%);
         background-size:
-          80px 100%,
+          60px 100%,
           100% 100%;
         transform: perspective(500px) rotateX(60deg);
         transform-origin: center top;
@@ -151,15 +249,14 @@
         background: repeating-linear-gradient(
           0deg,
           transparent,
-          transparent 78px,
-          rgba(0, 212, 255, 0.15) 78px,
-          rgba(0, 212, 255, 0.15) 80px
+          transparent 58px,
+          rgba(0, 212, 255, 0.15) 58px,
+          rgba(0, 212, 255, 0.15) 60px
         );
       }
 
-      /* 수평선 글로우 */
       .horizon {
-        position: fixed;
+        position: absolute;
         bottom: 40%;
         left: 0;
         right: 0;
@@ -172,38 +269,31 @@
         z-index: 4;
       }
 
-      /* 컨테이너 */
       .container {
-        position: fixed;
+        position: absolute;
         bottom: 8%;
         left: 50%;
         transform: translateX(-50%);
         z-index: 10;
         text-align: center;
-        padding: 20px;
-        width: 100%;
-        max-width: 800px;
-      }
-
-      /* 축하 화면 */
-      .celebration {
-        display: block;
+        padding: 15px;
+        width: 90%;
+        max-width: 700px;
       }
 
       .celeb-title {
-        font-size: clamp(20px, 5vw, 36px);
-        font-weight: 300;
+        font-family: var(--pixel-font);
+        font-size: clamp(10px, 2.5vw, 16px);
         color: var(--tron-blue);
-        letter-spacing: 0.5em;
-        margin-bottom: 15px;
+        letter-spacing: 0.2em;
+        margin-bottom: 10px;
         text-shadow: 0 0 20px var(--tron-blue);
         animation: fadeInSlide 1s ease forwards;
       }
 
       .celeb-year {
-        font-family: "Orbitron", monospace;
-        font-size: clamp(60px, 18vw, 160px);
-        font-weight: 900;
+        font-family: var(--pixel-font-en);
+        font-size: clamp(40px, 14vw, 90px);
         color: #fff;
         line-height: 1;
         text-shadow:
@@ -217,11 +307,11 @@
       }
 
       .celeb-sub {
-        font-size: clamp(16px, 4vw, 28px);
-        font-weight: 300;
+        font-family: var(--pixel-font);
+        font-size: clamp(10px, 2.5vw, 14px);
         color: var(--tron-blue);
-        margin-top: 20px;
-        letter-spacing: 0.3em;
+        margin-top: 15px;
+        letter-spacing: 0.15em;
         animation: fadeInSlide 1s ease 0.5s forwards;
         opacity: 0;
       }
@@ -268,9 +358,8 @@
         }
       }
 
-      /* 축하 효과 오버레이 */
       .celebration-overlay {
-        position: fixed;
+        position: absolute;
         top: 0;
         left: 0;
         width: 100%;
@@ -278,9 +367,9 @@
         pointer-events: none;
         z-index: 500;
         opacity: 1;
+        border-radius: 10px;
       }
 
-      /* 부드러운 빛줄기 */
       .light-rays {
         position: absolute;
         top: 50%;
@@ -312,7 +401,6 @@
         }
       }
 
-      /* 부드러운 글로우 펄스 */
       .glow-pulse {
         position: absolute;
         top: 50%;
@@ -340,7 +428,6 @@
         }
       }
 
-      /* 떠다니는 별 */
       .floating-stars {
         position: absolute;
         width: 100%;
@@ -374,18 +461,18 @@
         }
       }
 
-      /* 리플레이 버튼 */
+      /* 버튼 */
       .replay-btn {
         position: fixed;
         top: 20px;
         right: 20px;
         z-index: 2000;
         background: rgba(0, 212, 255, 0.2);
-        border: 1px solid var(--tron-blue);
+        border: 2px solid var(--tron-blue);
         color: var(--tron-blue);
-        padding: 12px 24px;
-        font-family: "Noto Sans KR", sans-serif;
-        font-size: 14px;
+        padding: 10px 16px;
+        font-family: var(--pixel-font);
+        font-size: 10px;
         cursor: pointer;
         border-radius: 4px;
         transition: all 0.3s ease;
@@ -396,18 +483,17 @@
         box-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
       }
 
-      /* 메인으로 돌아가기 */
       .back-btn {
         position: fixed;
         top: 20px;
         left: 20px;
         z-index: 2000;
         background: transparent;
-        border: 1px solid rgba(255, 255, 255, 0.3);
+        border: 2px solid rgba(255, 255, 255, 0.3);
         color: rgba(255, 255, 255, 0.6);
-        padding: 12px 24px;
-        font-family: "Noto Sans KR", sans-serif;
-        font-size: 14px;
+        padding: 10px 16px;
+        font-family: var(--pixel-font);
+        font-size: 10px;
         cursor: pointer;
         border-radius: 4px;
         transition: all 0.3s ease;
@@ -418,93 +504,78 @@
         border-color: var(--tron-blue);
         color: var(--tron-blue);
       }
+
+      @media (max-width: 600px) {
+        body {
+          padding: 10px;
+        }
+        .crt-monitor {
+          padding: 12px;
+          border-radius: 15px;
+        }
+        .replay-btn,
+        .back-btn {
+          font-size: 8px;
+          padding: 8px 12px;
+        }
+      }
     </style>
   </head>
   <body>
-    <!-- CRT 효과 오버레이 -->
-    <div class="crt-overlay"></div>
-    <div class="crt-vignette"></div>
+    <a href="index.html" class="back-btn">BACK</a>
+    <button class="replay-btn" onclick="replayEffect()">REPLAY</button>
 
-    <!-- 축하 효과 오버레이 -->
-    <div class="celebration-overlay">
-      <div class="light-rays"></div>
-      <div class="glow-pulse"></div>
-      <div class="floating-stars" id="floatingStars"></div>
-    </div>
+    <div class="crt-monitor">
+      <div class="power-led"></div>
+      <div class="crt-base"></div>
 
-    <!-- 파티클 배경 -->
-    <div id="tsparticles"></div>
+      <div class="crt-screen">
+        <div class="crt-overlay"></div>
+        <div class="crt-vignette"></div>
 
-    <!-- 하늘 그라데이션 -->
-    <div class="sky-gradient"></div>
+        <div class="celebration-overlay">
+          <div class="light-rays"></div>
+          <div class="glow-pulse"></div>
+          <div class="floating-stars" id="floatingStars"></div>
+        </div>
 
-    <!-- 태양 -->
-    <div class="sun"></div>
+        <div id="tsparticles"></div>
+        <div class="sky-gradient"></div>
+        <div class="sun"></div>
+        <div class="tron-grid"></div>
+        <div class="horizon"></div>
 
-    <div class="tron-grid"></div>
-    <div class="horizon"></div>
-
-    <!-- 버튼 -->
-    <a href="index.html" class="back-btn">메인으로</a>
-    <button class="replay-btn" onclick="replayEffect()">효과 다시보기</button>
-
-    <div class="container">
-      <div class="celebration">
-        <p class="celeb-title">새해 복 많이 받으세요</p>
-        <div class="celeb-year">2026</div>
-        <p class="celeb-sub">새로운 시작</p>
+        <div class="container">
+          <p class="celeb-title">새해 복 많이 받으세요</p>
+          <div class="celeb-year">2026</div>
+          <p class="celeb-sub">새로운 시작</p>
+        </div>
       </div>
     </div>
 
     <script>
-      // 파티클 초기화
       tsParticles.load("tsparticles", {
         particles: {
-          number: {
-            value: 30,
-            density: {
-              enable: true,
-              value_area: 800,
-            },
-          },
-          color: {
-            value: ["#00d4ff", "#ffffff", "#ff00ff"],
-          },
-          shape: {
-            type: "circle",
-          },
+          number: { value: 30, density: { enable: true, value_area: 800 } },
+          color: { value: ["#00d4ff", "#ffffff", "#ff00ff"] },
+          shape: { type: "circle" },
           opacity: {
             value: 0.4,
             random: true,
-            animation: {
-              enable: true,
-              speed: 0.3,
-              minimumValue: 0.1,
-              sync: false,
-            },
+            animation: { enable: true, speed: 0.3, minimumValue: 0.1 },
           },
           size: {
             value: 2,
             random: true,
-            animation: {
-              enable: true,
-              speed: 1,
-              minimumValue: 0.5,
-              sync: false,
-            },
+            animation: { enable: true, speed: 1, minimumValue: 0.5 },
           },
-          links: {
-            enable: false,
-          },
+          links: { enable: false },
           move: {
             enable: true,
             speed: 0.5,
             direction: "none",
             random: true,
-            straight: false,
-            outModes: {
-              default: "out",
-            },
+            outModes: { default: "out" },
           },
         },
         detectRetina: true,
@@ -531,7 +602,6 @@
       function fireCelebration() {
         const colors = ["#00d4ff", "#ffffff", "#ffdd00", "#ff00ff"];
 
-        // 첫 번째 폭죽 - 중앙에서 크게
         setTimeout(() => {
           confetti({
             particleCount: 100,
@@ -543,7 +613,6 @@
           });
         }, 100);
 
-        // 좌우에서 부드럽게
         setTimeout(() => {
           confetti({
             particleCount: 50,
@@ -563,7 +632,6 @@
           });
         }, 500);
 
-        // 지속적인 부드러운 confetti (10초)
         const duration = 10000;
         const end = Date.now() + duration;
 
@@ -594,7 +662,6 @@
 
         setTimeout(frame, 1000);
 
-        // 추가 폭죽 웨이브
         setTimeout(() => {
           confetti({
             particleCount: 80,
@@ -611,7 +678,6 @@
         fireCelebration();
       }
 
-      // 페이지 로드 시 효과 실행
       createFloatingStars();
       setTimeout(fireCelebration, 500);
     </script>
