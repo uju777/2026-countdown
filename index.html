@@ -8,11 +8,13 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Noto+Sans+KR:wght@300;400;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Noto+Serif+KR:wght@200;300;400;500;600&display=swap"
       rel="stylesheet"
     />
 
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tsparticles@2.12.0/tsparticles.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 
     <style>
       * {
@@ -27,7 +29,7 @@
       }
 
       body {
-        font-family: "Noto Sans KR", sans-serif;
+        font-family: "Noto Serif KR", serif;
         background: var(--black);
         min-height: 100vh;
         display: flex;
@@ -35,6 +37,54 @@
         justify-content: center;
         overflow: hidden;
         color: #fff;
+        cursor: none;
+      }
+
+      /* 커스텀 커서 */
+      .cursor {
+        position: fixed;
+        width: 20px;
+        height: 20px;
+        border: 2px solid var(--tron-blue);
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: 9999;
+        transition: transform 0.1s ease;
+        mix-blend-mode: difference;
+      }
+
+      .cursor-dot {
+        position: fixed;
+        width: 6px;
+        height: 6px;
+        background: var(--tron-blue);
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: 9999;
+        box-shadow:
+          0 0 10px var(--tron-blue),
+          0 0 20px var(--tron-blue);
+      }
+
+      .cursor-trail {
+        position: fixed;
+        width: 4px;
+        height: 4px;
+        background: var(--tron-blue);
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: 9998;
+        opacity: 0.5;
+      }
+
+      /* 파티클 배경 */
+      #tsparticles {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
       }
 
       /* 현재 시간 (우측 상단) */
@@ -48,8 +98,10 @@
 
       .current-date {
         font-size: 13px;
+        font-weight: 300;
         color: rgba(255, 255, 255, 0.4);
         margin-bottom: 4px;
+        letter-spacing: 0.05em;
       }
 
       .current-clock {
@@ -80,6 +132,7 @@
           100% 100%;
         transform: perspective(500px) rotateX(60deg);
         transform-origin: center top;
+        z-index: 2;
       }
 
       .tron-grid::before {
@@ -106,6 +159,7 @@
         box-shadow:
           0 0 20px var(--tron-blue),
           0 0 40px var(--tron-blue);
+        z-index: 3;
       }
 
       .container {
@@ -125,6 +179,8 @@
         line-height: 1;
         margin-bottom: 5px;
         text-shadow: 0 0 30px var(--tron-blue);
+        opacity: 0;
+        transform: translateY(-30px);
       }
 
       .subtitle {
@@ -133,6 +189,8 @@
         letter-spacing: 0.8em;
         color: rgba(0, 212, 255, 0.6);
         margin-bottom: 50px;
+        opacity: 0;
+        transform: translateY(-20px);
       }
 
       /* 카운트다운 */
@@ -147,6 +205,8 @@
         display: flex;
         flex-direction: column;
         align-items: center;
+        opacity: 0;
+        transform: scale(0.8);
       }
 
       .number-box {
@@ -162,6 +222,13 @@
           0 100%,
           0 10px
         );
+        transition: all 0.3s ease;
+      }
+
+      .number-box:hover {
+        background: rgba(0, 212, 255, 0.1);
+        box-shadow: 0 0 30px rgba(0, 212, 255, 0.3);
+        transform: scale(1.05);
       }
 
       .number-box::before {
@@ -198,6 +265,7 @@
         color: var(--tron-blue);
         margin-bottom: 30px;
         animation: pulse 1s ease-in-out infinite;
+        opacity: 0;
       }
 
       @keyframes pulse {
@@ -213,14 +281,16 @@
       /* 하단 메시지 */
       .message {
         margin-top: 50px;
-        font-size: clamp(14px, 3.5vw, 20px);
+        font-size: clamp(16px, 4vw, 24px);
         font-weight: 300;
-        color: rgba(255, 255, 255, 0.5);
-        letter-spacing: 0.08em;
+        color: rgba(255, 255, 255, 0.7);
+        letter-spacing: 0.12em;
         min-height: 1.5em;
+        opacity: 0;
+        transform: translateY(20px);
       }
 
-      .message .cursor {
+      .message .text-cursor {
         display: inline-block;
         width: 2px;
         height: 1em;
@@ -262,6 +332,7 @@
 
       .celeb-title {
         font-size: clamp(24px, 6vw, 48px);
+        font-weight: 300;
         color: var(--tron-blue);
         letter-spacing: 0.5em;
         margin-bottom: 20px;
@@ -279,6 +350,7 @@
 
       .celeb-sub {
         font-size: clamp(18px, 5vw, 32px);
+        font-weight: 300;
         color: var(--tron-blue);
         margin-top: 30px;
         letter-spacing: 0.3em;
@@ -298,10 +370,76 @@
         .number-box {
           padding: 12px 16px;
         }
+
+        body {
+          cursor: auto;
+        }
+
+        .cursor,
+        .cursor-dot {
+          display: none;
+        }
+      }
+
+      /* 글리치 효과 */
+      @keyframes glitch {
+        0% {
+          text-shadow:
+            0.05em 0 0 rgba(255, 0, 0, 0.75),
+            -0.05em -0.025em 0 rgba(0, 255, 0, 0.75),
+            0.025em 0.05em 0 rgba(0, 0, 255, 0.75);
+        }
+        14% {
+          text-shadow:
+            0.05em 0 0 rgba(255, 0, 0, 0.75),
+            -0.05em -0.025em 0 rgba(0, 255, 0, 0.75),
+            0.025em 0.05em 0 rgba(0, 0, 255, 0.75);
+        }
+        15% {
+          text-shadow:
+            -0.05em -0.025em 0 rgba(255, 0, 0, 0.75),
+            0.025em 0.025em 0 rgba(0, 255, 0, 0.75),
+            -0.05em -0.05em 0 rgba(0, 0, 255, 0.75);
+        }
+        49% {
+          text-shadow:
+            -0.05em -0.025em 0 rgba(255, 0, 0, 0.75),
+            0.025em 0.025em 0 rgba(0, 255, 0, 0.75),
+            -0.05em -0.05em 0 rgba(0, 0, 255, 0.75);
+        }
+        50% {
+          text-shadow:
+            0.025em 0.05em 0 rgba(255, 0, 0, 0.75),
+            0.05em 0 0 rgba(0, 255, 0, 0.75),
+            0 -0.05em 0 rgba(0, 0, 255, 0.75);
+        }
+        99% {
+          text-shadow:
+            0.025em 0.05em 0 rgba(255, 0, 0, 0.75),
+            0.05em 0 0 rgba(0, 255, 0, 0.75),
+            0 -0.05em 0 rgba(0, 0, 255, 0.75);
+        }
+        100% {
+          text-shadow:
+            -0.025em 0 0 rgba(255, 0, 0, 0.75),
+            -0.025em -0.025em 0 rgba(0, 255, 0, 0.75),
+            -0.025em -0.05em 0 rgba(0, 0, 255, 0.75);
+        }
+      }
+
+      .glitch:hover {
+        animation: glitch 0.3s infinite;
       }
     </style>
   </head>
   <body>
+    <!-- 커스텀 커서 -->
+    <div class="cursor"></div>
+    <div class="cursor-dot"></div>
+
+    <!-- 파티클 배경 -->
+    <div id="tsparticles"></div>
+
     <!-- 현재 시간 -->
     <div class="current-time">
       <div class="current-date" id="currentDate">2025년 12월 31일 화요일</div>
@@ -313,7 +451,7 @@
 
     <div class="container">
       <div id="countdown-screen">
-        <h1 class="title">2026</h1>
+        <h1 class="title glitch">2026</h1>
         <p class="subtitle">새해 카운트다운</p>
 
         <div class="countdown">
@@ -340,7 +478,7 @@
         </div>
 
         <p class="message">
-          <span id="quote"></span><span class="cursor"></span>
+          <span id="quote"></span><span class="text-cursor"></span>
         </p>
       </div>
 
@@ -352,6 +490,152 @@
     </div>
 
     <script>
+      // 파티클 초기화
+      tsParticles.load("tsparticles", {
+        particles: {
+          number: {
+            value: 50,
+            density: {
+              enable: true,
+              value_area: 800,
+            },
+          },
+          color: {
+            value: ["#00d4ff", "#ffffff", "#0088aa"],
+          },
+          shape: {
+            type: "circle",
+          },
+          opacity: {
+            value: 0.3,
+            random: true,
+            animation: {
+              enable: true,
+              speed: 0.5,
+              minimumValue: 0.1,
+              sync: false,
+            },
+          },
+          size: {
+            value: 2,
+            random: true,
+            animation: {
+              enable: true,
+              speed: 2,
+              minimumValue: 0.5,
+              sync: false,
+            },
+          },
+          links: {
+            enable: true,
+            distance: 150,
+            color: "#00d4ff",
+            opacity: 0.1,
+            width: 1,
+          },
+          move: {
+            enable: true,
+            speed: 0.8,
+            direction: "none",
+            random: true,
+            straight: false,
+            outModes: {
+              default: "out",
+            },
+          },
+        },
+        interactivity: {
+          detectsOn: "canvas",
+          events: {
+            onHover: {
+              enable: true,
+              mode: "grab",
+            },
+            onClick: {
+              enable: true,
+              mode: "push",
+            },
+          },
+          modes: {
+            grab: {
+              distance: 140,
+              links: {
+                opacity: 0.5,
+              },
+            },
+            push: {
+              quantity: 4,
+            },
+          },
+        },
+        detectRetina: true,
+      });
+
+      // 커스텀 커서
+      const cursor = document.querySelector(".cursor");
+      const cursorDot = document.querySelector(".cursor-dot");
+      let mouseX = 0,
+        mouseY = 0;
+      let cursorX = 0,
+        cursorY = 0;
+
+      document.addEventListener("mousemove", (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+        cursorDot.style.left = mouseX - 3 + "px";
+        cursorDot.style.top = mouseY - 3 + "px";
+      });
+
+      function animateCursor() {
+        cursorX += (mouseX - cursorX) * 0.1;
+        cursorY += (mouseY - cursorY) * 0.1;
+        cursor.style.left = cursorX - 10 + "px";
+        cursor.style.top = cursorY - 10 + "px";
+        requestAnimationFrame(animateCursor);
+      }
+      animateCursor();
+
+      // GSAP 인트로 애니메이션
+      gsap.to(".title", {
+        opacity: 1,
+        y: 0,
+        duration: 1,
+        ease: "power3.out",
+        delay: 0.3,
+      });
+
+      gsap.to(".subtitle", {
+        opacity: 1,
+        y: 0,
+        duration: 1,
+        ease: "power3.out",
+        delay: 0.5,
+      });
+
+      gsap.to(".time-unit", {
+        opacity: 1,
+        scale: 1,
+        duration: 0.8,
+        stagger: 0.15,
+        ease: "back.out(1.7)",
+        delay: 0.7,
+      });
+
+      gsap.to(".colon", {
+        opacity: 1,
+        duration: 0.5,
+        delay: 1.2,
+      });
+
+      gsap.to(".message", {
+        opacity: 1,
+        y: 0,
+        duration: 1,
+        ease: "power3.out",
+        delay: 1.5,
+      });
+
+      // 카운트다운 로직
       const newYear = new Date("2026-01-01T00:00:00+09:00");
       let celebrated = false;
 
@@ -499,7 +783,7 @@
       // 초기화 및 업데이트
       updateCurrentTime();
       updateCountdown();
-      typeQuote(); // 첫 명언
+      setTimeout(typeQuote, 2000); // 인트로 후 명언 시작
 
       setInterval(() => {
         updateCurrentTime();
