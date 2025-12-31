@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Noto+Serif+KR:wght@200;300;400;500;600&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Noto+Sans+KR:wght@200;300;400;500;700&display=swap"
       rel="stylesheet"
     />
 
@@ -29,7 +29,7 @@
       }
 
       body {
-        font-family: "Noto Serif KR", serif;
+        font-family: "Noto Sans KR", sans-serif;
         background: var(--black);
         min-height: 100vh;
         display: flex;
@@ -37,44 +37,6 @@
         justify-content: center;
         overflow: hidden;
         color: #fff;
-        cursor: none;
-      }
-
-      /* 커스텀 커서 */
-      .cursor {
-        position: fixed;
-        width: 20px;
-        height: 20px;
-        border: 2px solid var(--tron-blue);
-        border-radius: 50%;
-        pointer-events: none;
-        z-index: 9999;
-        transition: transform 0.1s ease;
-        mix-blend-mode: difference;
-      }
-
-      .cursor-dot {
-        position: fixed;
-        width: 6px;
-        height: 6px;
-        background: var(--tron-blue);
-        border-radius: 50%;
-        pointer-events: none;
-        z-index: 9999;
-        box-shadow:
-          0 0 10px var(--tron-blue),
-          0 0 20px var(--tron-blue);
-      }
-
-      .cursor-trail {
-        position: fixed;
-        width: 4px;
-        height: 4px;
-        background: var(--tron-blue);
-        border-radius: 50%;
-        pointer-events: none;
-        z-index: 9998;
-        opacity: 0.5;
       }
 
       /* 파티클 배경 */
@@ -370,15 +332,6 @@
         .number-box {
           padding: 12px 16px;
         }
-
-        body {
-          cursor: auto;
-        }
-
-        .cursor,
-        .cursor-dot {
-          display: none;
-        }
       }
 
       /* 글리치 효과 */
@@ -433,10 +386,6 @@
     </style>
   </head>
   <body>
-    <!-- 커스텀 커서 -->
-    <div class="cursor"></div>
-    <div class="cursor-dot"></div>
-
     <!-- 파티클 배경 -->
     <div id="tsparticles"></div>
 
@@ -570,30 +519,6 @@
         },
         detectRetina: true,
       });
-
-      // 커스텀 커서
-      const cursor = document.querySelector(".cursor");
-      const cursorDot = document.querySelector(".cursor-dot");
-      let mouseX = 0,
-        mouseY = 0;
-      let cursorX = 0,
-        cursorY = 0;
-
-      document.addEventListener("mousemove", (e) => {
-        mouseX = e.clientX;
-        mouseY = e.clientY;
-        cursorDot.style.left = mouseX - 3 + "px";
-        cursorDot.style.top = mouseY - 3 + "px";
-      });
-
-      function animateCursor() {
-        cursorX += (mouseX - cursorX) * 0.1;
-        cursorY += (mouseY - cursorY) * 0.1;
-        cursor.style.left = cursorX - 10 + "px";
-        cursor.style.top = cursorY - 10 + "px";
-        requestAnimationFrame(animateCursor);
-      }
-      animateCursor();
 
       // GSAP 인트로 애니메이션
       gsap.to(".title", {
